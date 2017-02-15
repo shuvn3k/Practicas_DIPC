@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/investigator/Desktop/Practicas_DIPC","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/sync":{"guestpath":"/sync","hostpath":"/home/investigator/Desktop/Practicas_DIPC/sync","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/investigator/Desktop/Practicas_DIPC","disabled":false,"__vagrantfile":true}}}

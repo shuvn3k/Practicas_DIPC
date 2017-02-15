@@ -11,7 +11,7 @@ sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
 echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
 echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
-sudo apt-get -y install oracle-java7-installer 
+sudo apt-get -y install oracle-java8-installer 
 
 
 
@@ -47,7 +47,7 @@ echo "deb http://packages.elastic.co/kibana/4.5/debian stable main" | sudo tee -
 apt-get update
 apt-get -y install kibana
 
-sed -i 's/server.host: /server.host: "localhost"/' /opt/kibana/config/kibana.yml
+sed -i 's/server.host: "0.0.0.0"/server.host: "localhost"/' /opt/kibana/config/kibana.yml
 
 systemctl daemon-reload
 systemctl enable kibana
@@ -59,8 +59,8 @@ sudo -v
 
 
 #creamos el usuario de kibana
-echo "kibanaadmin:$apr1$PyFSkPGc$GVVIRv.hxOxyvxnxUi2Ao1'" | tee -a /etc/nginx/htpasswd.users
-#echo "kibanaadmin:`openssl /etc/nginx/htpasswd.users passwd -apr1`" | sudo tee -a /etc/nginx/htpsswd.users
+echo 'kibanaadmin:$apr1$NBSPHdue$vsdsiustshGsOyTi.QNX1/' | tee -a /etc/nginx/htpasswd.users
+#echo "kibanaadmin:`openssl passwd -apr1`" | sudo tee -a /etc/nginx/htpasswd.users
 
 
 mv /tmp/default "/etc/nginx/sites-available/default"
@@ -81,13 +81,14 @@ mkdir -p /etc/pki/tls/certs
 mkdir /etc/pki/tls/private
 
 
-sed -i 's/\[ v3_ca \]/\[ v3_ca \]\nsubjectAltName = IP:192.168.34.150/' /etc/ssl/openssl.cnf
+sed -i 's/\[ v3_ca \]/\[ v3_ca \]\nsubjectAltName = IP: 192.168.34.150/' /etc/ssl/openssl.cnf
 
 
 
 #creamos el certificado ssl
-openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
+openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
 
+cp /etc/pki/tls/certs/logstash-forwarder.crt /sync/logstash-forwarder.crt
 
 #movemos el fichero 02-beats-input.conf a su correspondiente carpeta
 
@@ -99,7 +100,7 @@ ufw allow 5044
 #movemos el archivo 10-syslog-filter.conf a su correspondiente carpeta
 mv /tmp/10-syslog-filter.conf /etc/logstash/conf.d/10-syslog-filter.conf
 #movemos el archivo 30-elasticsearch-ouput.conf a su carpeta
-mv /tmp/30-elasticsearch-ouput.conf /etc/logstash/conf.d/30-elasticsearch-output.conf
+mv /tmp/30-elasticsearch-output.conf /etc/logstash/conf.d/30-elasticsearch-output.conf
 
 
 systemctl restart logstash
@@ -107,13 +108,15 @@ systemctl enable logstash
 
 
 #instalamos los dashboards de kibana
-
+cd /
 curl -L -O https://download.elastic.co/beats/dashboards/beats-dashboards-1.2.2.zip
 unzip beats-dashboards-1.2.2.zip
-sh beats-dashboards-1.2.2/load.sh
-
+cd beats-dashboards-1.2.2/
+sh load.sh
 
 #instalamos indices para plantilla filebeat
+cd /
 curl -O https://gist.githubusercontent.com/thisismitch/3429023e8438cc25b86c/raw/d8c479e2a1adcea8b1fe86570e42abab0f10f364/filebeat-index-template.json
 
 curl -XPUT 'http://localhost:9200/_template/filebeat?pretty' -d@filebeat-index-template.json
+ 
