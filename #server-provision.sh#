@@ -84,6 +84,9 @@ mkdir /etc/pki/tls/private
 sed -i 's/\[ v3_ca \]/\[ v3_ca \]\nsubjectAltName = IP: 192.168.34.150/' /etc/ssl/openssl.cnf
 
 
+# obtenemos el certificado y key desde git
+apt-get install git
+curl -O https://github.com/ivanathletic/Practicas_DIPC/tree/master/sync
 
 #creamos el certificado ssl
 openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
