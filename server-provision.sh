@@ -15,13 +15,6 @@ sudo apt-get -y install oracle-java8-installer
 
 
 
-#sudo add-apt-repository -y ppa:/webupd8team/java
-#sudo apt-get update
-# sudo apt-get --force-yes install oracle-java8-installer
-# echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-# apt-get install default-jre
-# apt-get install default-jdk
-
 apt-get install unzip
 
 #Instalamos elasticsearch
@@ -60,7 +53,6 @@ sudo -v
 
 #creamos el usuario de kibana
 echo 'kibanaadmin:$apr1$NBSPHdue$vsdsiustshGsOyTi.QNX1/' | tee -a /etc/nginx/htpasswd.users
-#echo "kibanaadmin:`openssl passwd -apr1`" | sudo tee -a /etc/nginx/htpasswd.users
 
 
 mv /tmp/default "/etc/nginx/sites-available/default"
@@ -84,13 +76,14 @@ mkdir /etc/pki/tls/private
 sed -i 's/\[ v3_ca \]/\[ v3_ca \]\nsubjectAltName = IP: 192.168.34.150/' /etc/ssl/openssl.cnf
 
 
+# obtenemos el certificado y key desde git
+apt-get install git
+curl -O https://raw.githubusercontent.com/ivanathletic/Practicas_DIPC/master/sync/logstash-forwarder.crt
+curl -O https://raw.githubusercontent.com/ivanathletic/Practicas_DIPC/master/sync/logstash-forwarder.key
 
-#creamos el certificado ssl
-openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
+mv logstash-forwarder.crt /etc/pki/tls/certs/logstash-forwarder.crt
+mv logstash-forwarder.key /etc/pki/tls/private/logstash-forwarder.key
 
-cp /etc/pki/tls/certs/logstash-forwarder.crt /sync/logstash-forwarder.crt
-
-#movemos el fichero 02-beats-input.conf a su correspondiente carpeta
 
 mv /tmp/02-beats-input.conf /etc/logstash/conf.d/02-beats-input.conf
 
