@@ -1,0 +1,16 @@
+winlogbeat.event_logs:
+  - name: Application
+  - name: Security
+  - name: System
+
+output.logstash:
+  hosts: ["192.168.34.150:5044"]
+  bulk_max_size: 1024
+  #index: winlogbeat
+  ssl:
+    certificate_authorities: ["C:/ProgramData/winlogbeat/logstash-forwarder.crt"]
+
+logging.to_files: true
+logging.files:
+  path: C:/ProgramData/winlogbeat/Logs
+logging.level: info
